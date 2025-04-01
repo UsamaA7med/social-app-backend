@@ -15,5 +15,7 @@ export default async (email, username, isVerified, res) => {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     sameSite: "none",
     secure: true,
+    path: "/",
+    domain: "https://social-app-frontend-tawny.vercel.app",
   });
 };
