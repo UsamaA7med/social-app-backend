@@ -131,7 +131,12 @@ const checkAuth = asyncMiddleware(async (req, res, next) => {
 });
 
 const logout = asyncMiddleware(async (req, res, next) => {
-  res.clearCookie("jwt");
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+    path: "/",
+  });
   res.json({ message: "Logged out successfully" });
 });
 
