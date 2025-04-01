@@ -23,7 +23,7 @@ const authRoutes = express.Router();
 authRoutes.post("/signup", signup, SendOTPVerificationEmail);
 authRoutes.post("/login", login);
 authRoutes.get("/checkAuth", checkAuth);
-authRoutes.get("/logout", logout);
+authRoutes.post("/logout", logout);
 authRoutes.put(
   "/updateProfile",
   protectedMiddleware,
