@@ -13,6 +13,7 @@ export default async (email, username, isVerified, res) => {
   res.cookie("jwt", token, {
     httpOnly: true,
     maxAge: 7 * 24 * 60 * 60 * 1000,
+    sameSite: "none",
     secure: true,
   });
 };

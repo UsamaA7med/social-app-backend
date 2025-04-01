@@ -15,7 +15,6 @@ app.use(
   corse({
     origin: process.env.CLIENT_URL,
     credentials: true,
-    sameSite: "none",
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
   })
