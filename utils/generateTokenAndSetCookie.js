@@ -16,6 +16,5 @@ export default async (email, username, isVerified, res) => {
     sameSite: "none",
     secure: true,
     path: "/",
-    domain: "https://social-app-frontend-tawny.vercel.app",
   });
 };
