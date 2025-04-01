@@ -13,8 +13,7 @@ app.use(cookieParser());
 
 app.use(
   corse({
-    origin:
-      "https://social-app-frontend-git-main-usamaa7meds-projects.vercel.app/",
+    origin: "https://social-app-frontend-tawny.vercel.app/",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
