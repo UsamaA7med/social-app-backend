@@ -146,10 +146,10 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
         await cloudinaryDeleteImage(req.user.profileImage.publicId);
       }
 
-      const file = req.files.profileImage[0]; // File from memory
+      const file = req.files.profileImage[0]; // Accessing the file buffer in memory
       const result = await cloudinary.v2.uploader.upload(file.buffer, {
-        resource_type: "auto", // Automatically detects file type
-        folder: "user_profiles", // Optional: Cloudinary folder
+        resource_type: "auto", // Automatically detects file type (image, video, etc.)
+        folder: "user_profiles", // Optional: Cloudinary folder for organization
       });
 
       req.user.profileImage = {
@@ -164,10 +164,10 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
         await cloudinaryDeleteImage(req.user.coverImage.publicId);
       }
 
-      const file = req.files.coverImage[0]; // File from memory
+      const file = req.files.coverImage[0]; // Accessing the file buffer in memory
       const result = await cloudinary.v2.uploader.upload(file.buffer, {
-        resource_type: "auto", // Automatically detects file type
-        folder: "user_cover_images", // Optional: Cloudinary folder
+        resource_type: "auto", // Automatically detects file type (image, video, etc.)
+        folder: "user_cover_images", // Optional: Cloudinary folder for organization
       });
 
       req.user.coverImage = {
@@ -177,7 +177,7 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
     }
   }
 
-  // Proceed with updating other profile fields like username, password, etc.
+  // Update other profile fields like username, fullname, and bio
   if (req.body.username) {
     const usernameExists = await User.findOne({
       username: req.body.username,
@@ -198,6 +198,7 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
     req.user.bio = req.body.bio;
   }
 
+  // Update password if both current and new passwords are provided
   if (
     (req.body.currentPassword && !req.body.newPassword) ||
     (!req.body.currentPassword && req.body.newPassword)
@@ -223,6 +224,7 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
     req.user.password = hashedPassword;
   }
 
+  // Save the updated user profile
   await req.user.save();
 
   const user = await User.findById(req.user._id)
