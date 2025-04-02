@@ -1,5 +1,4 @@
 import cloudinary from "cloudinary";
-import fs from "fs";
 
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_NAME,
@@ -7,8 +6,8 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const cloudinaryUploadImage = async (filePath) => {
-  return cloudinary.uploader.upload(filePath, { folder: "uploads" });
+const cloudinaryUploadImage = async (file) => {
+  return cloudinary.v2.uploader.upload(file, { resource_type: "auto" });
 };
 
 const cloudinaryDeleteImage = async (publicId) => {

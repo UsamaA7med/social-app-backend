@@ -7,7 +7,10 @@ import jwt from "jsonwebtoken";
 import { fileURLToPath } from "url";
 import path from "path";
 import sharp from "sharp";
-import { cloudinaryDeleteImage } from "../config/cloudinary.js";
+import {
+  cloudinaryDeleteImage,
+  cloudinaryUploadImage,
+} from "../config/cloudinary.js";
 import Post from "../models/postModel.js";
 import cloudinary from "cloudinary";
 
@@ -148,20 +151,9 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
 
       const file = req.files.profileImage[0]; // File buffer in memory
 
-      const uploadImageToCloudinary = (buffer) => {
-        return new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { resource_type: "auto", folder: "user_profiles" },
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            }
-          );
-          streamifier.createReadStream(buffer).pipe(stream);
-        });
-      };
-
-      const result = await uploadImageToCloudinary(file.buffer);
+      const b64 = Buffer.from(file.buffer).toString("base64");
+      const url = "data:" + file.mimetype + ";base64," + b64;
+      const result = await cloudinaryUploadImage(url);
 
       req.user.profileImage = {
         url: result.secure_url,
@@ -176,20 +168,9 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
 
       const file = req.files.coverImage[0]; // File buffer in memory
 
-      const uploadImageToCloudinary = (buffer) => {
-        return new Promise((resolve, reject) => {
-          const stream = cloudinary.uploader.upload_stream(
-            { resource_type: "auto", folder: "user_cover_images" },
-            (error, result) => {
-              if (error) return reject(error);
-              resolve(result);
-            }
-          );
-          streamifier.createReadStream(buffer).pipe(stream);
-        });
-      };
-
-      const result = await uploadImageToCloudinary(file.buffer);
+      const b64 = Buffer.from(file.buffer).toString("base64");
+      const url = "data:" + file.mimetype + ";base64," + b64;
+      const result = await cloudinaryUploadImage(url);
 
       req.user.coverImage = {
         url: result.secure_url,
