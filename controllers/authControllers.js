@@ -63,9 +63,6 @@ const SendOTPVerificationEmail = asyncMiddleware(async (req, res, next) => {
 `,
   };
   await transporter.sendMail(mailOptions);
-  res
-    .status(201)
-    .json({ message: "User created successfully", user: req.user });
 });
 
 const signup = asyncMiddleware(async (req, res, next) => {
@@ -88,7 +85,7 @@ const signup = asyncMiddleware(async (req, res, next) => {
   const hashedPassword = await bcrypt.hash(req.body.password, 11);
   const newUser = new User({ ...req.body, password: hashedPassword });
   await newUser.save();
-  res.user = newUser;
+  res.status(201).json({ message: "User created successfully", user: newUser });
   next();
 });
 
