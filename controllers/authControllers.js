@@ -161,10 +161,10 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
         await cloudinaryDeleteImage(req.user.coverImage.publicId);
       }
       const metadata = await sharp(req.files.coverImage[0].path).metadata();
-      const width = 600;
-      if (metadata.width === width) {
+      console.log(metadata.height);
+      if (metadata.height !== 500 || metadata.width !== 800) {
         return next(
-          generateError("Cover image width must be 1600px", 400, "error")
+          generateError("Cover image height must be 300px", 400, "error")
         );
       }
       const imagePath = path.join(
@@ -338,6 +338,7 @@ const suggestedUsers = asyncMiddleware(async (req, res, next) => {
   const followingIds = user.following.map((follow) => follow._id.toString());
   const suggestedUsers = await User.find({
     _id: { $nin: followingIds, $ne: user._id.toString() },
+    isVerified: true,
   })
     .limit(3)
     .populate("posts");
@@ -349,6 +350,7 @@ const searchUsers = asyncMiddleware(async (req, res, next) => {
   const keyword = req.body.keyword;
   const users = await User.find({
     fullname: { $regex: keyword, $options: "i" },
+    isVerified: true,
   }).populate("posts");
   res.json({ status: "success", data: users });
 });

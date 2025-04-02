@@ -83,9 +83,18 @@ userSchema.virtual("posts", {
 const validateSignup = (body) => {
   const schema = Joi.object({
     email: Joi.string().email().required(),
-    fullname: Joi.string().min(3).max(255).required(),
-    password: Joi.string().min(8).required(),
-    username: Joi.string().min(3).max(255).required(),
+    fullname: Joi.string().min(3).required().messages({
+      "string.min": "fullname must be at least 3 characters long.",
+      "string.empty": "fullname cannot be empty.",
+    }),
+    password: Joi.string().min(8).required().messages({
+      "string.min": "password must be at least 8 characters long.",
+      "string.empty": "password cannot be empty.",
+    }),
+    username: Joi.string().min(3).required().messages({
+      "string.min": "username must be at least 3 characters long.",
+      "string.empty": "username cannot be empty.",
+    }),
   });
   return schema.validate(body);
 };
