@@ -12,13 +12,11 @@ import {
   cloudinaryUploadImage,
 } from "../config/cloudinary.js";
 import Post from "../models/postModel.js";
-import cloudinary from "cloudinary";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 import nodemailer from "nodemailer";
 import OTP from "../models/OTPVerification.js";
-import streamifier from "streamifier";
 
 let transporter = nodemailer.createTransport({
   service: "gmail",
@@ -65,6 +63,9 @@ const SendOTPVerificationEmail = asyncMiddleware(async (req, res, next) => {
 `,
   };
   await transporter.sendMail(mailOptions);
+  res
+    .status(201)
+    .json({ message: "User created successfully", user: req.user });
 });
 
 const signup = asyncMiddleware(async (req, res, next) => {
@@ -87,7 +88,7 @@ const signup = asyncMiddleware(async (req, res, next) => {
   const hashedPassword = await bcrypt.hash(req.body.password, 11);
   const newUser = new User({ ...req.body, password: hashedPassword });
   await newUser.save();
-  res.status(201).json({ message: "User created successfully", user: newUser });
+  res.user = newUser;
   next();
 });
 
