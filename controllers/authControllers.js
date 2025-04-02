@@ -140,16 +140,15 @@ const logout = asyncMiddleware(async (req, res, next) => {
 
 const updateProfile = asyncMiddleware(async (req, res, next) => {
   if (req.files) {
-    // For profileImage
     if (req.files.profileImage) {
       if (req.user.profileImage.publicId) {
         await cloudinaryDeleteImage(req.user.profileImage.publicId);
       }
 
-      const file = req.files.profileImage[0]; // Accessing the file buffer in memory
+      const file = req.files.profileImage[0]; // This is the buffer
       const result = await cloudinary.v2.uploader.upload(file.buffer, {
-        resource_type: "auto", // Automatically detects file type (image, video, etc.)
-        folder: "user_profiles", // Optional: Cloudinary folder for organization
+        resource_type: "auto", // Automatically detect file type
+        folder: "user_profiles", // Optional folder in Cloudinary
       });
 
       req.user.profileImage = {
@@ -158,16 +157,15 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       };
     }
 
-    // For coverImage
     if (req.files.coverImage) {
       if (req.user.coverImage.publicId) {
         await cloudinaryDeleteImage(req.user.coverImage.publicId);
       }
 
-      const file = req.files.coverImage[0]; // Accessing the file buffer in memory
+      const file = req.files.coverImage[0]; // This is the buffer
       const result = await cloudinary.v2.uploader.upload(file.buffer, {
-        resource_type: "auto", // Automatically detects file type (image, video, etc.)
-        folder: "user_cover_images", // Optional: Cloudinary folder for organization
+        resource_type: "auto", // Automatically detect file type
+        folder: "user_cover_images", // Optional folder in Cloudinary
       });
 
       req.user.coverImage = {
@@ -176,7 +174,6 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       };
     }
   }
-
   // Update other profile fields like username, fullname, and bio
   if (req.body.username) {
     const usernameExists = await User.findOne({
