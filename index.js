@@ -13,7 +13,7 @@ app.use(cookieParser());
 
 app.use(
   corse({
-    origin: process.env.CLIENT_URL,
+    origin: "https://social-app-frontend-tawny.vercel.app",
     credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
     methods: ["GET", "POST", "PUT", "DELETE"],
