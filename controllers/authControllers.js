@@ -145,13 +145,23 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
         await cloudinaryDeleteImage(req.user.profileImage.publicId);
       }
 
-      const file = req.files.profileImage[0]; // This is the buffer
-      const result = await cloudinary.v2.uploader.upload_stream({
-        resource_type: "auto", // Automatically detect file type
-        folder: "user_profile_images", // Optional folder in Cloudinary
-        overwrite: true,
-        public_id: file.replace(/\.[^/.]+$/, ""),
-      });
+      const file = req.files.profileImage[0]; // File buffer in memory
+
+      const uploadImageToCloudinary = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { resource_type: "auto", folder: "user_profiles" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+          streamifier.createReadStream(buffer).pipe(stream);
+        });
+      };
+
+      const result = await uploadImageToCloudinary(file.buffer);
+
       req.user.profileImage = {
         url: result.secure_url,
         publicId: result.public_id,
@@ -163,11 +173,22 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
         await cloudinaryDeleteImage(req.user.coverImage.publicId);
       }
 
-      const file = req.files.coverImage[0]; // This is the buffer
-      const result = await cloudinary.v2.uploader.upload(file.buffer, {
-        resource_type: "auto", // Automatically detect file type
-        folder: "user_cover_images", // Optional folder in Cloudinary
-      });
+      const file = req.files.coverImage[0]; // File buffer in memory
+
+      const uploadImageToCloudinary = (buffer) => {
+        return new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { resource_type: "auto", folder: "user_cover_images" },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result);
+            }
+          );
+          streamifier.createReadStream(buffer).pipe(stream);
+        });
+      };
+
+      const result = await uploadImageToCloudinary(file.buffer);
 
       req.user.coverImage = {
         url: result.secure_url,
@@ -175,7 +196,7 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       };
     }
   }
-  // Update other profile fields like username, fullname, and bio
+
   if (req.body.username) {
     const usernameExists = await User.findOne({
       username: req.body.username,
@@ -196,7 +217,6 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
     req.user.bio = req.body.bio;
   }
 
-  // Update password if both current and new passwords are provided
   if (
     (req.body.currentPassword && !req.body.newPassword) ||
     (!req.body.currentPassword && req.body.newPassword)
@@ -222,7 +242,6 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
     req.user.password = hashedPassword;
   }
 
-  // Save the updated user profile
   await req.user.save();
 
   const user = await User.findById(req.user._id)
