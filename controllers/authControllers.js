@@ -146,11 +146,10 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       }
 
       const file = req.files.profileImage[0]; // This is the buffer
-      const result = await cloudinary.v2.uploader.upload(file.buffer, {
+      const result = await cloudinary.v2.uploader.upload_stream(file.buffer, {
         resource_type: "auto", // Automatically detect file type
         folder: "user_profiles", // Optional folder in Cloudinary
       });
-
       req.user.profileImage = {
         url: result.secure_url,
         publicId: result.public_id,
