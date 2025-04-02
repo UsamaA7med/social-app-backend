@@ -7,12 +7,8 @@ cloudinary.v2.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-const cloudinaryUploadImage = async (path) => {
-  const result = await cloudinary.v2.uploader.upload(path, {
-    resource_type: "auto",
-  });
-  fs.unlinkSync(path);
-  return result;
+const cloudinaryUploadImage = async (filePath) => {
+  return cloudinary.uploader.upload(filePath, { folder: "uploads" });
 };
 
 const cloudinaryDeleteImage = async (publicId) => {

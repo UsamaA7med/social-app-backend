@@ -146,54 +146,59 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       if (req.user.profileImage.publicId) {
         await cloudinaryDeleteImage(req.user.profileImage.publicId);
       }
-      const imagePath = path.join(
-        __dirname,
-        `../images/${req.files.profileImage[0].filename}`
-      );
-      const result = await cloudinaryUploadImage(imagePath);
+
+      const file = req.files.profileImage[0];
+      const result = await cloudinaryUploadImage(file.path); // Upload directly from the file path (no local saving)
+
       req.user.profileImage = {
         url: result.secure_url,
         publicId: result.public_id,
       };
     }
+
     if (req.files.coverImage) {
       if (req.user.coverImage.publicId) {
         await cloudinaryDeleteImage(req.user.coverImage.publicId);
       }
-      const metadata = await sharp(req.files.coverImage[0].path).metadata();
-      console.log(metadata.height);
+
+      const file = req.files.coverImage[0];
+      const metadata = await sharp(file.buffer).metadata();
+
       if (metadata.height !== 500 || metadata.width !== 800) {
         return next(
           generateError("Cover image height must be 300px", 400, "error")
         );
       }
-      const imagePath = path.join(
-        __dirname,
-        `../images/${req.files.coverImage[0].filename}`
-      );
-      const result = await cloudinaryUploadImage(imagePath);
+
+      const result = await cloudinaryUploadImage(file.path); // Upload directly to Cloudinary
+
       req.user.coverImage = {
         url: result.secure_url,
         publicId: result.public_id,
       };
     }
   }
+
   if (req.body.username) {
     const usernameExists = await User.findOne({
       username: req.body.username,
       _id: { $ne: req.user._id },
     });
+
     if (usernameExists) {
       return next(generateError("Username already exists", 400, "error"));
     }
     req.user.username = req.body.username;
   }
+
   if (req.body.fullname) {
     req.user.fullname = req.body.fullname;
   }
+
   if (req.body.bio) {
     req.user.bio = req.body.bio;
   }
+
   if (
     (req.body.currentPassword && !req.body.newPassword) ||
     (!req.body.currentPassword && req.body.newPassword)
@@ -206,6 +211,7 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       )
     );
   }
+
   if (req.body.currentPassword && req.body.newPassword) {
     const validPassword = await bcrypt.compare(
       req.body.currentPassword,
@@ -217,10 +223,13 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
     const hashedPassword = await bcrypt.hash(req.body.newPassword, 11);
     req.user.password = hashedPassword;
   }
+
   await req.user.save();
+
   const user = await User.findById(req.user._id)
     .populate("posts")
     .sort({ createdAt: -1 });
+
   res.json({ data: user });
 });
 
