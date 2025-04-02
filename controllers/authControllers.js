@@ -7,11 +7,9 @@ import jwt from "jsonwebtoken";
 import { fileURLToPath } from "url";
 import path from "path";
 import sharp from "sharp";
-import {
-  cloudinaryDeleteImage,
-  cloudinaryUploadImage,
-} from "../config/cloudinary.js";
+import { cloudinaryDeleteImage } from "../config/cloudinary.js";
 import Post from "../models/postModel.js";
+import cloudinary from "cloudinary";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -149,7 +147,7 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       }
 
       const file = req.files.profileImage[0]; // File from memory
-      const result = await cloudinary.uploader.upload(file.buffer, {
+      const result = await cloudinary.v2.uploader.upload(file.buffer, {
         resource_type: "auto", // Automatically detects file type
         folder: "user_profiles", // Optional: Cloudinary folder
       });
@@ -167,7 +165,7 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       }
 
       const file = req.files.coverImage[0]; // File from memory
-      const result = await cloudinary.uploader.upload(file.buffer, {
+      const result = await cloudinary.v2.uploader.upload(file.buffer, {
         resource_type: "auto", // Automatically detects file type
         folder: "user_cover_images", // Optional: Cloudinary folder
       });
