@@ -142,13 +142,17 @@ const logout = asyncMiddleware(async (req, res, next) => {
 
 const updateProfile = asyncMiddleware(async (req, res, next) => {
   if (req.files) {
+    // For profileImage
     if (req.files.profileImage) {
       if (req.user.profileImage.publicId) {
         await cloudinaryDeleteImage(req.user.profileImage.publicId);
       }
 
-      const file = req.files.profileImage[0];
-      const result = await cloudinaryUploadImage(file.path); // Upload directly from the file path (no local saving)
+      const file = req.files.profileImage[0]; // File from memory
+      const result = await cloudinary.uploader.upload(file.buffer, {
+        resource_type: "auto", // Automatically detects file type
+        folder: "user_profiles", // Optional: Cloudinary folder
+      });
 
       req.user.profileImage = {
         url: result.secure_url,
@@ -156,21 +160,17 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
       };
     }
 
+    // For coverImage
     if (req.files.coverImage) {
       if (req.user.coverImage.publicId) {
         await cloudinaryDeleteImage(req.user.coverImage.publicId);
       }
 
-      const file = req.files.coverImage[0];
-      const metadata = await sharp(file.buffer).metadata();
-
-      if (metadata.height !== 500 || metadata.width !== 800) {
-        return next(
-          generateError("Cover image height must be 300px", 400, "error")
-        );
-      }
-
-      const result = await cloudinaryUploadImage(file.path); // Upload directly to Cloudinary
+      const file = req.files.coverImage[0]; // File from memory
+      const result = await cloudinary.uploader.upload(file.buffer, {
+        resource_type: "auto", // Automatically detects file type
+        folder: "user_cover_images", // Optional: Cloudinary folder
+      });
 
       req.user.coverImage = {
         url: result.secure_url,
@@ -179,6 +179,7 @@ const updateProfile = asyncMiddleware(async (req, res, next) => {
     }
   }
 
+  // Proceed with updating other profile fields like username, password, etc.
   if (req.body.username) {
     const usernameExists = await User.findOne({
       username: req.body.username,
