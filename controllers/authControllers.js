@@ -63,6 +63,7 @@ const SendOTPVerificationEmail = asyncMiddleware(async (req, res, next) => {
 `,
   };
   await transporter.sendMail(mailOptions);
+  res.status(200).json({ message: "OTP sent successfully" });
 });
 
 const signup = asyncMiddleware(async (req, res, next) => {
@@ -86,6 +87,7 @@ const signup = asyncMiddleware(async (req, res, next) => {
   const newUser = new User({ ...req.body, password: hashedPassword });
   await newUser.save();
   res.status(201).json({ message: "User created successfully", user: newUser });
+  next();
 });
 
 const login = asyncMiddleware(async (req, res, next) => {
