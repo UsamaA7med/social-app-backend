@@ -101,8 +101,14 @@ const validateSignup = (body) => {
 
 const validateLogin = (body) => {
   const schema = Joi.object({
-    email: Joi.string().email().required(),
-    password: Joi.string().required(),
+    email: Joi.string().email().required().messages({
+      "string.empty": "email cannot be empty.",
+      "string.email": "Invalid email format.",
+    }),
+    password: Joi.string().min(8).required().messages({
+      "string.empty": "password cannot be empty.",
+      "string.min": "password must be at least 8 characters long.",
+    }),
   });
   return schema.validate(body);
 };
