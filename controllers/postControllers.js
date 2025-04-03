@@ -17,8 +17,10 @@ import generateError from "../utils/generateError.js";
 const createPost = asyncMiddleware(async (req, res, next) => {
   let newPost;
   if (req.file) {
-    const imagePath = path.join(__dirname, `../images/${req.file.filename}`);
-    const result = await cloudinaryUploadImage(imagePath);
+    const file = req.file[0];
+    const b64 = Buffer.from(file.buffer).toString("base64");
+    const url = "data:" + file.mimetype + ";base64," + b64;
+    const result = await cloudinaryUploadImage(url);
     newPost = new Post({
       content: req.body.text,
       user: req.user._id,
@@ -27,7 +29,6 @@ const createPost = asyncMiddleware(async (req, res, next) => {
         publicId: result.public_id,
       },
     });
-    fs.unlinkSync(imagePath);
   } else {
     newPost = new Post({
       user: req.user._id,
