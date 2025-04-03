@@ -18,7 +18,7 @@ const postRoutes = express.Router();
 postRoutes.post(
   "/create",
   protectedMiddleware,
-  uploadImage.single("image"),
+  uploadImage.fields([{ name: "image", maxCount: 1 }]),
   createPost
 );
 
