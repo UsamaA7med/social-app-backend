@@ -16,8 +16,8 @@ import generateError from "../utils/generateError.js";
 
 const createPost = asyncMiddleware(async (req, res, next) => {
   let newPost;
-  if (req.file) {
-    const file = req.file[0];
+  if (req.files) {
+    const file = req.files.image[0];
     const b64 = Buffer.from(file.buffer).toString("base64");
     const url = "data:" + file.mimetype + ";base64," + b64;
     const result = await cloudinaryUploadImage(url);
