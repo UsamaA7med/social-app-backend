@@ -69,7 +69,7 @@ const toggleFollow = asyncMiddleware(async (req, res, next) => {
   }
   await req.user.save();
   await userToFollow.save();
-  res.json({ status: "success", data: req.user });
+  res.json({ status: "success", data: userToFollow });
 });
 
 const toggleLike = asyncMiddleware(async (req, res, next) => {
