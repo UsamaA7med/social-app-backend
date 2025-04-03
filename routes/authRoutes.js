@@ -20,7 +20,7 @@ import uploadImage from "../utils/photoUpload.js";
 
 const authRoutes = express.Router();
 
-authRoutes.post("/signup", signup, SendOTPVerificationEmail);
+authRoutes.post("/signup", signup);
 authRoutes.post("/login", login);
 authRoutes.get("/checkAuth", checkAuth);
 authRoutes.post("/logout", logout);
