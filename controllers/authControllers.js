@@ -28,7 +28,7 @@ let transporter = nodemailer.createTransport({
 });
 
 const SendOTPVerificationEmail = asyncMiddleware(async (req, res, next) => {
-  await OTP.findOneAndDelete({ email: req.body.email });
+  await OTP.findOneAndDelete({ email: req.params.email });
   const otp = `${Math.floor(1000 + Math.random() * 9000)}`;
   const hashedOTP = await bcrypt.hash(otp, 11);
   const otpVerification = new OTP({
@@ -40,7 +40,7 @@ const SendOTPVerificationEmail = asyncMiddleware(async (req, res, next) => {
 
   const mailOptions = {
     from: process.env.EMAIL_USER,
-    to: req.body.email,
+    to: req.params.email,
     subject: "OTP Verification",
     html: `<!DOCTYPE html>
 <html>
